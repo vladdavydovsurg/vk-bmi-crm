@@ -6,8 +6,6 @@ import io
 
 logger = logging.getLogger(__name__)
 
-# ⚠ Укажи путь к tesseract.exe (если нужно)
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
 class OCRService:
