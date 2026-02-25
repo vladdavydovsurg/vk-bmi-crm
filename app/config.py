@@ -22,11 +22,17 @@ class Settings:
 
 
 def _build_database_url() -> str:
+    # Если Railway передал DATABASE_URL — используем его
+    railway_url = os.getenv("DATABASE_URL")
+    if railway_url:
+        return railway_url.replace("postgresql://", "postgresql+asyncpg://")
+
+    # Локальный fallback (для запуска на компьютере)
     host = os.getenv("DB_HOST", "127.0.0.1")
     port = os.getenv("DB_PORT", "5432")
     name = os.getenv("DB_NAME", "vk_bmi_crm")
     user = os.getenv("DB_USER", "postgres")
-    password = quote_plus(os.getenv("DB_PASSWORD", ""))  # <<< ВАЖНО
+    password = quote_plus(os.getenv("DB_PASSWORD", ""))
 
     return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}"
 
