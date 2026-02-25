@@ -4,6 +4,7 @@ from typing import Any
 import gspread
 from google.oauth2.service_account import Credentials
 
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +18,8 @@ class SheetsService:
             "https://www.googleapis.com/auth/drive",
         ]
 
-        credentials = Credentials.from_service_account_file(
-            service_account_json,
+        credentials = Credentials.from_service_account_info(
+            json.loads(service_account_json),
             scopes=scopes,
         )
 
