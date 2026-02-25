@@ -6,3 +6,5 @@ PaddleOCR>=2.8.1
 openai>=1.51.2
 gspread>=6.1.2
 google-auth>=2.35.0
+pytesseract
+Pillow
