@@ -22,10 +22,10 @@ class AIParserService:
 
         full_text = self._normalize_text(raw_text)
 
-        # Имя ищем во всём тексте (с fallback)
+        # 🔹 Имя ищем во всём тексте
         name = self._extract_name(full_text)
 
-        # Блок подтверждённых данных
+        # 🔹 Извлекаем блок подтверждения
         confirmation_block = self._extract_confirmation_block(full_text)
 
         if not confirmation_block:
@@ -99,10 +99,11 @@ class AIParserService:
         return text.strip()
 
     # =====================================================
-    # NAME (с fallback)
+    # NAME (ищем во всём тексте)
     # =====================================================
 
     def _extract_name(self, text: str) -> Optional[str]:
+        # сначала пробуем "Имя:"
         m = re.search(
             r"(?:\bИмя\b|\bФИО\b)\s*[:\-]?\s*([А-ЯЁ][а-яё]+(?:\s+[А-ЯЁ][а-яё]+){1,2})",
             text,
@@ -110,12 +111,12 @@ class AIParserService:
         if m:
             return m.group(1).strip()
 
-        # fallback
+        # fallback — первое нормальное ФИО
         m = re.search(r"\b[А-ЯЁ][а-яё]+ [А-ЯЁ][а-яё]+\b", text)
         return m.group(0) if m else None
 
     # =====================================================
-    # CONTACT (ТОЛЬКО ИЗ CONFIRMATION BLOCK)
+    # CONTACT (только из подтверждения)
     # =====================================================
 
     def _extract_contact(self, text: str) -> tuple[Optional[str], Optional[str]]:
@@ -161,23 +162,36 @@ class AIParserService:
         return phone
 
     # =====================================================
-    # WEIGHT / HEIGHT
+    # WEIGHT / HEIGHT (только из подтверждения)
     # =====================================================
 
     def _extract_weight_height(self, text: str) -> tuple[Optional[float], Optional[float]]:
         height = None
         weight = None
 
-        hm = re.search(r"\bРост\s*[:\-]?\s*(\d{2,3})\b", text, re.IGNORECASE)
+        hm = re.search(r"\bРост\s*[:\-]?\s*(\d{2,3})", text, re.IGNORECASE)
         if hm:
             v = int(hm.group(1))
             if 120 <= v <= 220:
                 height = float(v)
 
-        wm = re.search(r"\bВес\s*[:\-]?\s*(\d{2,3})\b", text, re.IGNORECASE)
+        wm = re.search(r"\bВес\s*[:\-]?\s*(\d{2,3})", text, re.IGNORECASE)
         if wm:
             v = int(wm.group(1))
             if 35 <= v <= 300:
                 weight = float(v)
+
+        # через единицы
+        cm = re.search(r"\b(\d{2,3})\s*см\b", text, re.IGNORECASE)
+        if cm:
+            v = int(cm.group(1))
+            if 120 <= v <= 220:
+                height = height or float(v)
+
+        kg = re.search(r"\b(\d{2,3})\s*кг\b", text, re.IGNORECASE)
+        if kg:
+            v = int(kg.group(1))
+            if 35 <= v <= 300:
+                weight = weight or float(v)
 
         return weight, height
