@@ -80,13 +80,22 @@ class AIParserService:
     # =====================================================
 
     def _extract_confirmation_block(self, text: str) -> Optional[str]:
-        marker = "Пожалуйста, подтвердите ваши данные"
-        idx = text.lower().find(marker.lower())
+        markers = [
+            "Пожалуйста, подтвердите ваши данные",
+            "Пожалуйста, подтвердите, всё ли верно",
+            "Пожалуйста подтвердите всё ли верно",
+            "Контакт:",
+            "Контакт",
+        ]
 
-        if idx == -1:
-            return None
+        low = text.lower()
 
-        return text[idx + len(marker):].strip()
+        for marker in markers:
+            idx = low.find(marker.lower())
+            if idx != -1:
+                return text[idx:].strip()
+
+        return None
 
     # =====================================================
     # NORMALIZATION

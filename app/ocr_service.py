@@ -1,11 +1,18 @@
 import logging
+import os
+import io
+
 import pytesseract
 from PIL import Image
-import io
 
 
 logger = logging.getLogger(__name__)
 
+
+# Локально на Windows явно указываем путь к Tesseract.
+# На Railway/Linux этот путь не используется.
+if os.name == "nt":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 
 class OCRService:
@@ -20,7 +27,7 @@ class OCRService:
 
             text = pytesseract.image_to_string(
                 image,
-                lang="rus+eng"
+                lang="rus+eng",
             )
 
             logger.info("OCR extracted text length=%s", len(text))
